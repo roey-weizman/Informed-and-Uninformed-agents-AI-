@@ -1,45 +1,40 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+Environment simulator and agents for the Hurricane Evacuation Problem
+Implementing an environment simulator that runs a path optimization problem with agents that live in the environment and evaluate their performance.
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+Given a weighted graph,  the goal is (starting at a given vertex) to visit as many as possible out of a set of vertices, and reach a given goal vertex before a given deadline. However, unlike standard shortest path problems in graphs, which have easy known efficient solution methods (e.g. the Dijkstra algorithm), here the problem is that there are more than 2 vertices to visit, their order is not given, and even the number of visited vertices is not known in advance. This is a problem encountered in many real-world settings, such as when you are trying to evacuate people who are stuck at home with no transportation before the hurricane arrives.
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+Hurricane Evacuation problem environment
+The environment consists of a weighted unidrected graph. Each vertex may contain a number of people to be evacuated, or a hurricane shelter. An agent (evacuation vehicle) at a vertex automatically picks up all the people at this vertex just before starting the next move, unless the vertex contains a hurricane shelter, in which case everybody in the vehicle is dropped off at the shelter (goal). It is also possible for edges (roads) to be blocked, assumnig complete knowledge such that all edges are initially unblocked.
 
----
+An agent can only do no-op (taking 1 time unit) or traverse actions. The time for traverse actions is equal to: w(1+Kp), where w is the edge weight, p is the number of people in the vehicle, and K is a known global non-negative "slow-down" constant, determining how much the vehicle is slowed due to load. The action always succeeds, unless the time limit is breached.
 
-## Edit a file
+The simulator should keep track of time, the number of actions done by each agent, and the total number of people successfully evacuated.
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+Implementation part I: simulator + simple agents
+Initially Thera are several simple (non-AI) agents. The environment simulator start up by reading the graph from a file, as well as the contents of vertices and global constants, in a the given format(Worlds directory).
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+The simulator querying the user about the number of agents and what agent program to use for each of them, from a list defined below. Global constants and initialization parameters for each agent (initial position) are also to be queried from the user.
 
----
+After the above initialization, the simulator running each agent in turn, performing the actions retured by the agents, and update the world accordingly. Additionally, the simulator is capable of displaying the state of the world after each step, with the appropriate state of the agents and their score.
 
-## Create a file
+Each agent program (a function) works as follows:
+The agent is called by the simulator, together with a set of observations. The agent returns a move to be carried out in the current world state. The agent is allowed to keep an internal state if needed.
+There are several agents:
 
-Next, you’ll add a new file to this repository.
+A human agent- printing the state, read the next move from the user, and return it to the simulator. This is used for debugging and evaluating the program.
+A greedy agent- the agent computing the shortest currently unblocked path to the next vertex with people to be rescued, or to a shelter if it is carrying people, and try to follow it. If there is no such path, doing no-op.
+A vandal agent- it does V no-ops, and then blocks the lowest-cost edge adjacent to its current vertex (takes 1 time unit). Then it traverses a lowest-cost remaining edge, and this is repeated. Prefering the lowest-numbered node in case of ties. If there is no edge to block or traverse, do no-op.
+At this stage, runing the environment with three agents participating in each run: one greedy agent, one vandal agent, and one other agent that can be chosen by the user. 
+There isalso a part of intelligent agents that need to act in this environment. Each agent should assume that it is acting alone, regardless of whether it is true.
+All the algorithms will use a heuristic evaluation function of your choice.
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+The agents working as follows:
+A greedy search agent, that picks the move with best immediate heuristic value to expand next.
+An agent using A* search, with the same heuristic.
+An agent using a simplified version of real-time A*.
+The performance measure will be composed of two parts: S, the agent's score, and N, the number of search expansion steps performed by the search algorithm. The performance of an agent will be:
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+   P = f * S + N
+Clearly, a better agent will have P as small as possible.
+The parameter f is a weight constant (can use with values of f: -1, -100, -10000)
 
----
-
-## Clone a repository
-
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
-
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
-
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
