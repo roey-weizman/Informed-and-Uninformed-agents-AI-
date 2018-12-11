@@ -36,11 +36,12 @@ class WorldSimulator(object):
         table.append_row(['1', '2', '3'])
         print(table)
 
+        location = int(input("where do you want the agent to start?\n"))
+
         agent_type = int(input("Choose the type of search agent to activate:\n"))
         expands_for_RTA=6
-        search_tree = SearchTreeBuilder(world, deadline, 1).build()
+        search_tree = SearchTreeBuilder(world, deadline, location).build()
 
-        location = int(input("where do you want the agent to start?\n"))
 
         perform_f = int(input("Please insert performance  f value\n"))
         selected_agent = AStarSearchAgent(location, self.world_info,search_tree) if agent_type == 1 \
