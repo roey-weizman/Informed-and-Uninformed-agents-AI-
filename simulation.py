@@ -36,9 +36,10 @@ class WorldSimulator(object):
         table.append_row(['1', '2', '3'])
         print(table)
 
-        location = int(input("where do you want the agent to start?\n"))
-
         agent_type = int(input("Choose the type of search agent to activate:\n"))
+        
+        location = int(input("where do you want the agent to start?\n"))
+        
         expands_for_RTA=6
         search_tree = SearchTreeBuilder(world, deadline, location).build()
 
