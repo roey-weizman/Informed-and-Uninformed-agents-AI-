@@ -51,22 +51,23 @@ def dijkstra(graph, source):
         if v.id != source:
             dist[v.id] = float("inf")
             prev[v.id] = -1
-            heappush(q, (float('inf'),v.id))
+            heappush(q, (float('inf'), v.id))
 
-
-    for i in range(0,len(dist.items())):
-        for v,w in dist.items():
-            if not v in used:
-                heappush(q,(w,v))
-        v_dist,v_id = heappop(q)
+    for i in range(0, len(dist.items())):
+        v_dist, v_id = heappop(q)
         used.append(v_id)
         neighbours = graph.get_valid_neighbours_byID(v_id)
         for u in neighbours:
-            edge = graph.get_edge_byIDs(v_id,u)
+            edge = graph.get_edge_byIDs(v_id, u)
             alt = v_dist + edge.weight
             if alt < dist[u]:
                 dist[u] = alt
                 prev[u] = v_id
+                for item in q:
+                    if item[1] == u:
+                        q.remove(item)
+                heappush(q, (dist[u], u))
+                heapify(q)
 
 
     return dist,prev
